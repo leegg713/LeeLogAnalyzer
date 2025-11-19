@@ -18,17 +18,15 @@ Create folders: generator/, analyzer/, docs/, data/, tests/, scripts/. etc -- Co
 
 Phase 2 — Config
 
-Define services and events in config.ps1
+Define services and events in config.ps1 -- Completed (Can add more later for further analysis)
 
-Example: system, access, app services
+Event types with probabilities and error rates -- Completed (Can adjust and modify as needed)
 
-Event types with probabilities and error rates
+Define default paths for logs and analysis output -- Completed
 
-Define default paths for logs and analysis output
+Set thresholds for alerts (e.g., errors/minute, failed logins) -- Completed
 
-Set thresholds for alerts (e.g., errors/minute, failed logins)
-
-Add streaming parameters defaults (events/sec, duration)
+Add streaming parameters defaults (events/sec, duration) -- Completed 
 
 Phase 3 — Utils Functions
 
