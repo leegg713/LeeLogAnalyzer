@@ -4,6 +4,7 @@
 # -----------------------------
 # Services and Event Definitions
 # -----------------------------
+## HASHTABLE ##
 $Services = @{
     "system" = @{
         "events" = @("startup","shutdown","update","error")
@@ -18,6 +19,13 @@ $Services = @{
         "errorRate" = 0.08   # 8% of events are errors
     }
 }
+#EXAMPLE USAGE#
+<#
+$Services["access"]["events"]
+Output: login logout invalidPassword invalidUsername passwordChange
+$Services["app"]["errorRate"]
+Output: 0.08
+#>
 #----------#  Paths #----------#
 $LogPath = "$PSScriptRoot\data\logs\"          # Where generated logs are stored
 $AnalysisPath = "$PSScriptRoot\data\analysis\" # Where analysis reports go
