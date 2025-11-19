@@ -30,7 +30,7 @@ Add streaming parameters defaults (events/sec, duration) -- Completed
 
 Phase 3 — Utils Functions
 
- Random timestamp generator
+ Random timestamp generator -- Completed
 
  Random user/session/correlation ID generator
 
