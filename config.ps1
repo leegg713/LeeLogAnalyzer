@@ -27,8 +27,8 @@ $Services["app"]["errorRate"]
 Output: 0.08
 #>
 #----------#  Paths #----------#
-$LogPath = "$PSScriptRoot\data\logs\"          # Where generated logs are stored
-$AnalysisPath = "$PSScriptRoot\data\analysis\" # Where analysis reports go
+$LogPath = "$PSScriptRoot/data/logs/"          # Where generated logs are stored
+$AnalysisPath = "$PSScriptRoot/data/analysis/" # Where analysis reports go
 
 
 #----------# Generator Defaults #----------#
