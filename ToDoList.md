@@ -34,15 +34,9 @@ Phase 3 — Utils Functions
 
  Random user/session/correlation ID generator -- Completed
 
- Random log level generator (INFO/WARN/ERROR)
+ Random log level generator (INFO/WARN/ERROR) -- Completed 
 
- Bad actor behavior generator (optional, triggers anomalies)
-
- Parsing helper functions (for analyzer)
-
- Normalization and correlation helpers (for analyzer)
-
- Metrics calculation helpers (error counts, events per minute, etc.)
+ Bad actor behavior generator (optional, triggers anomalies) -- ADD LATER ON??
 
 Phase 4 — Generator.ps1
 
@@ -65,6 +59,14 @@ Enable/disable bad actor
  Optional: print summary of generation (number of logs, bad actor events)
 
 Phase 5 — Analyzer.ps1
+
+First 3 can go in utils or analyzer its up to you
+
+Parsing helper functions (for analyzer)
+
+ Normalization and correlation helpers (for analyzer)
+
+ Metrics calculation helpers (error counts, events per minute, etc.)
 
  Dot-source utils.ps1 and config.ps1
 
@@ -127,7 +129,3 @@ Phase 8 — Optional Enhancements
  Additional log types or services
 
  Extra anomaly detection rules
-
-If you want, I can also make a “day-by-day plan” mapping this to 2–4 days so you can follow it like a sprint and actually hit a working version quickly.
-
-Do you want me to do that?
