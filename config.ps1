@@ -7,18 +7,22 @@
 ## HASHTABLE ##
 $Services = @{
     "system" = @{
-        "events" = @("startup","shutdown","update","error")
-        "errorRate" = 0.05   # 5% of events are errors
+        "events"     = @("startup","shutdown","update")
+        "errorEvents" = @("error")
+        "errorRate"  = 0.05
     }
     "access" = @{
-        "events" = @("login","logout","invalidPassword","invalidUsername","passwordChange")
-        "errorRate" = 0.1    # 10% of events are errors
+        "events"      = @("login","logout","passwordChange")
+        "errorEvents" = @("invalidPassword","invalidUsername")
+        "errorRate"   = 0.1
     }
     "app" = @{
-        "events" = @("start","stop","exception","crash","restart")
-        "errorRate" = 0.08   # 8% of events are errors
+        "events"      = @("start","stop","restart")
+        "errorEvents" = @("exception","crash")
+        "errorRate"   = 0.08
     }
 }
+
 #EXAMPLE USAGE#
 <#
 $Services["access"]["events"]
