@@ -1,6 +1,6 @@
 # Load the config so $Services and other settings are available
 . "$PSScriptRoot\config.ps1"
-Write-Host " $LogPath "
+#Write-Host " $LogPath "
 <#
 #### FUNCTIONS TO WORK ON ####
  Random log level generator (INFO/WARN/ERROR)
@@ -120,8 +120,66 @@ $userLog.LogID   # 3e288663-54d7-433c-9dfb-de98583daea0
 
 #Random log level generator (INFO/WARN/ERROR)
 ######## Function to create a log level for a log event ########
-function Generate-LogLevel {
 
+function Generate-RandomLogEvent {
+    <#
+    $goodSystemEvents = $Services["system"]["events"]
+    Write-Host "Good System Events: $goodSystemEvents" # Prints list of all good system events
+    $goodAccessEvents = $Services["access"]["events"]
+    Write-Host "Good Access Events: $goodAccessEvents" # Prints list of all  good access Events
+    $goodAppEvents = $Services["app"]["events"]
+    Write-Host "Good App Events: $goodAppEvents" # Prints list of all good app events
 
+    $badSystemEvents = $Services["system"]["errorEvents"]
+    $badAccessEvents = $Services["access"]["errorEvents"]
+    $badAppEvents = $Services["app"]["errorEvents"]
+    Write-Host "Bad System Events: $badSystemEvents" # Prints list of all bad system events
+    Write-Host "Bad Access Events: $badAccessEvents" # Prints list of all bad access events
+    Write-Host "Bad App Events: $badAppEvents" # Prints list of all bad app events
+    #>
+    # Pick a random service name
+    $service = Get-Random -InputObject @($Services.Keys)
+
+    # Get the service info
+    $svc = $Services[$service]
+
+    # Determine if it's an error by getting a double
+    $isError = (Get-Random -Minimum 0.00 -Maximum 1.00) -lt $svc.errorRate
+
+    if ($isError) {
+        $event = Get-Random -InputObject $svc.errorEvents
+        $eventType = "ERROR"
+    } else {
+        $event = Get-Random -InputObject $svc.events
+        $eventType = "INFO"
+    }
+
+    # Build PSCustomObject
+    $logEvent = [PSCustomObject]@{
+        Service   = $service
+        EventType = $eventType
+        Event     = $event
+    }
+
+    return $logEvent
 }
-Generate-LogLevel
+    
+#Generate-RandomLogEvent
+### EXAMPLE USAGE ###
+<#
+$logEvent = Generate-RandomLogEvent
+$logEvent.Service   # system or access or app
+$logEvent.EventType   # error or info
+$logEvent.Event   # invalid login, restart, start, stop, etc
+#Write-Host "$($logEvent.Service)"
+#>
+# Test loop to verify it works 
+<#
+$i = 0
+while ($i -lt 100) {
+    $logEvent = Generate-RandomLogEvent
+    Write-Host "$($logEvent.Service) - $($logEvent.EventType) - $($logEvent.Event)"
+    $i++
+}
+#>
+
