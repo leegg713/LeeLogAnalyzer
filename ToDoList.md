@@ -40,11 +40,11 @@ Phase 3 — Utils Functions
 
 Phase 4 — Generator.ps1
 
- Dot-source utils.ps1 and config.ps1
+ Dot-source utils.ps1 and config.ps1 - Completed
 
  Add CLI argument parsing for:
 
-Batch vs streaming mode
+Batch vs streaming mode 
 
 Number of events or rate/duration
 
