@@ -1,3 +1,31 @@
+<#
+.SYNOPSIS
+    Configuration file for the log generator and log analyzer modules.
+
+.DESCRIPTION
+    This configuration script centralizes all variables, paths, thresholds, 
+    and settings used by both generator.ps1 and analyzer.ps1. Updating values 
+    here allows global changes to log behavior, event generation, alerting, 
+    and environment paths without modifying the main scripts.
+
+.EXAMPLE
+    # Access an event list from the Services hashtable
+    $Services["access"]["events"]
+    # Output:
+    # login logout invalidPassword invalidUsername passwordChange
+
+.EXAMPLE
+    # Retrieve error rate for the app service
+    $Services["app"]["errorRate"]
+    # Output:
+    # 0.08
+
+.NOTES
+    This file is intended to be imported by multiple scripts. 
+    Modify settings here to ensure consistent behavior across the project.
+#>
+
+
 # Config file will contain all the code that is used for generating logs
 # Variables and parameters will be changed here to affect generator.ps1
 
