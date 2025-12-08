@@ -45,7 +45,8 @@ $PlainTextLog = Join-Path $LogPath "Text_Generated_Logs.txt"
 ############ Object arrays ############
 $CSV_Log_Objects = @()
 $JSON_Log_Objects = @()
-$Text_Log_Objects = @()
+# Prepare an empty array for the lines for the txt file
+$logLines = @()
 
 
 # Batch Mode Set Up
@@ -93,17 +94,12 @@ $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encod
 # Loop through each log object in the array $Log_Objects
 # and create a formatted string for each log entry.
 # Each line will contain: TimeStamp | User | Event
-$logLines = foreach ($log in $CSV_Log_Objects) {
 
-    # Build a single line for this log object
-    # Using the format: "TimeStamp | User | Event"
+# Loop through each CSV log object and build a formatted string
+foreach ($log in $CSV_Log_Objects) {
     $line = "$($log.TimeStamp) | $($log.Email) | $($log.Event) | $($log.Service) | $($log.EventType) | $($log.LogID)"
-
-    
-    # Output the line to the array $logLines
-    $line
+    $logLines += $line
 }
-
 # At this point, $logLines contains one string per log object
 # Example:
 # 2025-01-01_10-00-00 | UserA | Login
