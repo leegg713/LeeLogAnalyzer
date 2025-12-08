@@ -56,9 +56,7 @@ for ($i = 0; $i -lt $DefaultBatchSize; $i++) {
     $timeStamp = Generate-RandomTimeStamp # Stores function data retrieved in $timestamp -- EX: $timeStamp.CSV
     $userLog = Generate-RandomUserLog # Stores function data retrieved in $userLog -- EX: $userLog.Email
     $logEvent = Generate-RandomLogEvent # Stores function data retrieved in $logEvent -- EX: $logEvent.EventType
-    # Need to have all this information go into a CSV, JSON, and PlainText file
-    # Path for each would be $LogPath
-    # Log object
+    
 
     # CSV LOG OBJECTS and TXT LOG OBJECTS
     $CSVLogObject = [PSCustomObject]@{
@@ -82,7 +80,6 @@ for ($i = 0; $i -lt $DefaultBatchSize; $i++) {
 
     }
     # BELOW/OUTSIDE FOR LOOP #
-# Write CSV
 # CSV
 $CSV_Log_Objects | Export-Csv -Path $CSVLog -NoTypeInformation
 
@@ -93,18 +90,12 @@ $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encod
 # TXT
 # Loop through each log object in the array $Log_Objects
 # and create a formatted string for each log entry.
-# Each line will contain: TimeStamp | User | Event
 
 # Loop through each CSV log object and build a formatted string
 foreach ($log in $CSV_Log_Objects) {
     $line = "$($log.TimeStamp) | $($log.Email) | $($log.Event) | $($log.Service) | $($log.EventType) | $($log.LogID)"
     $logLines += $line
 }
-# At this point, $logLines contains one string per log object
-# Example:
-# 2025-01-01_10-00-00 | UserA | Login
-# 2025-01-01_10-05-00 | UserB | Logout
-# 2025-01-01_10-10-00 | UserC | AccessDenied
 
 # Write all lines to a plain text file specified by $PlainTextLog
 # The -Encoding UTF8 ensures proper encoding for special characters
