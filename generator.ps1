@@ -20,7 +20,15 @@ param
 (
 	[Parameter(Mandatory = $True)]
     [ValidateSet("Batch", "Streaming")]
-    [string]$Mode
+    [string]$Mode,
+    [Parameter(Mandatory = $False)]
+    [switch]$Append,
+    [Parameter(Mandatory = $False)]
+    [int]$Duration, # Duration in seconds
+    [Parameter(Mandatory = $False)]
+    [int]$EventsPerSecond,
+    [Parameter(Mandatory = $False)]
+    [switch]$ClearOldLogs
 )
 # Imports configuration file config.ps1
 . "$PSScriptRoot\config.ps1"
@@ -32,10 +40,18 @@ param
 # Imports utils.ps1 file
 . "$PSScriptRoot\utils.ps1"
 
+# Clears Old Logs 
+if ($ClearOldLogs) {
+    Write-Host "Clearing entire log directory..." -ForegroundColor Yellow
+    Get-ChildItem -Path $LogPath -File | Remove-Item -Force
+}
+
+
 # If the folder does not exist for the data, creates the folder
 if (-not (Test-Path $LogPath)) {
     New-Item -ItemType Directory -Path $LogPath | Out-Null
 }
+
 
 ############ Global Log Path Variables for outputting data to files ############ 
 $CSVLog = Join-Path $LogPath "CSV_Generated_Logs.csv"
@@ -80,12 +96,6 @@ for ($i = 0; $i -lt $DefaultBatchSize; $i++) {
 
     }
     # BELOW/OUTSIDE FOR LOOP #
-# CSV
-$CSV_Log_Objects | Export-Csv -Path $CSVLog -NoTypeInformation
-
-# JSON
-# Look into this more to understand it better
-$JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8
 
 # TXT
 # Loop through each log object in the array $Log_Objects
@@ -96,9 +106,97 @@ foreach ($log in $CSV_Log_Objects) {
     $line = "$($log.TimeStamp) | $($log.Email) | $($log.Event) | $($log.Service) | $($log.EventType) | $($log.LogID)"
     $logLines += $line
 }
+# 
+if ($Append){
+    # Appends to CSV and doesn't overwrite if $Append parameter selected
+    $CSV_Log_Objects | Export-Csv -Path $CSVLog -Append -NoTypeInformation
+    $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8 -Append
+    $logLines | Out-File -FilePath $PlainTextLog -Encoding UTF8 -Append
 
-# Write all lines to a plain text file specified by $PlainTextLog
-# The -Encoding UTF8 ensures proper encoding for special characters
-$logLines | Out-File -FilePath $PlainTextLog -Encoding UTF8
+
+}
+else{
+    $CSV_Log_Objects | Export-Csv -Path $CSVLog -NoTypeInformation
+    $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8
+    $logLines | Out-File -FilePath $PlainTextLog -Encoding UTF8
+
+}
+
+# Summary of last batch run
+
+# Prints a small output of what the last batch run created -- Can be used for verifying everything worked and just a nice output to have
+$CSV_Log_Objects | Group-Object -Property Service,EventType,Event | Select Name, Count
+
 
 } # END OF BATCH IF STATEMENT # 
+
+# Streaming Mode Start
+
+if ($Mode -eq "Streaming") {
+
+    # Override defaults if a different value is provided
+    if ($Duration){
+        $DefaultDuration = $Duration
+    }
+    if ($EventsPerSecond){
+        $DefaultEventsPerSecond = $EventsPerSecond
+    }
+
+    $endTime = (Get-Date).AddSeconds($DefaultDuration)
+    # Can comment out the write hosts after verifying everything works
+    Write-Host "Ending at: $endTime"
+    Write-Host "Duration: $DefaultDuration seconds"
+    Write-Host "Events per second: $DefaultEventsPerSecond"
+
+    Write-Host "Streaming mode enabled... Ctrl+C to stop it early"
+
+    while ((Get-Date) -lt $endTime) {
+
+        # Reset per-loop for streaming mode
+        $CSV_Log_Objects = @()
+        $JSON_Log_Objects = @()
+        $logLines = @()
+
+        # Generate N events per second
+        for ($i = 0; $i -lt $DefaultEventsPerSecond; $i++) {
+
+            $timeStamp = Generate-RandomTimeStamp
+            $userLog   = Generate-RandomUserLog
+            $logEvent  = Generate-RandomLogEvent
+
+            # CSV / TXT object
+            $CSVLogObject = [PSCustomObject]@{
+                TimeStamp = $timeStamp.CSV
+                Service   = $logEvent.Service
+                EventType = $logEvent.EventType
+                Event     = $logEvent.Event
+                Email     = $userLog.Email
+                LogID     = $userLog.LogID
+            }
+            $CSV_Log_Objects += $CSVLogObject
+
+            # JSON object
+            $JSON_Log_Objects += [PSCustomObject]@{
+                TimeStamp = $timeStamp
+                User      = $userLog
+                Event     = $logEvent
+            }
+        }
+
+        # Build TXT log lines
+        foreach ($log in $CSV_Log_Objects) {
+            $line = "$($log.TimeStamp) | $($log.Email) | $($log.Event) | $($log.Service) | $($log.EventType) | $($log.LogID)"
+            $logLines += $line
+        }
+
+        # (Streaming = append the whole time -- Tip: Use Clear Old Logs to start fresh)
+        $CSV_Log_Objects  | Export-Csv -Path $CSVLog -Append -NoTypeInformation
+        $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8 -Append
+        $logLines         | Out-File -FilePath $PlainTextLog -Encoding UTF8 -Append
+
+        # Maintain exactly 1 loop per second
+        Start-Sleep -Seconds 1
+    }
+}
+
+
