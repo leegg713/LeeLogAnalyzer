@@ -54,13 +54,7 @@ Phase 5 — Analyzer.ps1
 
 First 3 can go in utils or analyzer its up to you
 
-Parsing helper functions (for analyzer)
-
- Normalization and correlation helpers (for analyzer)
-
- Metrics calculation helpers (error counts, events per minute, etc.)
-
- Dot-source utils.ps1 and config.ps1
+ Dot-source utils.ps1 and config.ps1 - Completed
 
  Add CLI argument parsing for:
 
@@ -77,6 +71,9 @@ Target log file(s) or folder
 Errors per minute per service
 
 Log counts
+
+Alerting System -- Just have it output alerts to the console -- Can make an email function for it too but not really necessary for this
+Have the email function in place and just comment it out
 
 TODO: correlation of events by session or ID
 
