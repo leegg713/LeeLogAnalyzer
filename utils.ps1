@@ -101,7 +101,7 @@ function Generate-RandomUserLog {
 
     ### LOG ID GENERATION SECTION ###
     $guid = [guid]::NewGuid().ToString() # A GUID (Globally Unique Identifier) is a 128-bit value and should be unique
-    Write-Host "$guid"
+    #Write-Host "$guid"
     # Return as a hashtable
     #<#
     return @{
