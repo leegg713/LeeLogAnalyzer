@@ -36,27 +36,19 @@ Phase 3 — Utils Functions
 
  Random log level generator (INFO/WARN/ERROR) -- Completed 
 
- Bad actor behavior generator (optional, triggers anomalies) -- ADD LATER ON??
-
 Phase 4 — Generator.ps1
 
  Dot-source utils.ps1 and config.ps1 - Completed
 
- Add CLI argument parsing for:
+ Add CLI argument parsing for: - Completed
 
-Batch vs streaming mode 
+Batch vs streaming mode - Both completed
 
-Number of events or rate/duration
+ Write generated events to data/logs/ - Completed
+ 
+Parameter to append to the file instead of overwrite - Completed
 
-Log types to generate
-
-Enable/disable bad actor
-
- Loop through event generation using helpers
-
- Write generated events to data/logs/
-
- Optional: print summary of generation (number of logs, bad actor events)
+Optional: print summary of generation (number of logs, bad actor events) - Completed
 
 Phase 5 — Analyzer.ps1
 
@@ -129,3 +121,7 @@ Phase 8 — Optional Enhancements
  Additional log types or services
 
  Extra anomaly detection rules
+
+ Enable/disable bad actor automatically
+
+ Make the streaming mode be exactly a second for each loop and not a little off (Stopwatch needed)
