@@ -76,7 +76,7 @@ $timeStamp.JSON        # 2025-11-19T21:09:23.289Z
 function Generate-RandomUserLog {
     # Function Variables that can modify output/return
     $domain = "@leeTestDomain.com"
-    $MinLength = 4
+    $MinLength = 6
     $MaxLength = 8
     ### USERNAME GENERATION SECTION ###
     $totalLength = Get-Random -Minimum $MinLength -Maximum ($MaxLength + 1)
