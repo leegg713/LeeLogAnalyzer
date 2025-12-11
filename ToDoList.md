@@ -114,6 +114,8 @@ How to configure services/events/thresholds
 
 Phase 8 — Optional Enhancements
 
+Change user log to generate username list to use for logs so we have one user having multiple events
+
  Real-time CLI dashboard in analyzer
 
  Configurable output formats (JSON, CSV, text)
