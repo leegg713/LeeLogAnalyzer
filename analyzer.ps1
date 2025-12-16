@@ -38,3 +38,110 @@ param
 
 # Imports utils.ps1 file
 . "$PSScriptRoot\utils.ps1"
+
+# Import the data from $LogPath = "$PSScriptRoot/data/logs/ Just doing CSV first" 
+
+#### Count Variables for calculations ###
+
+##### ADD VARIABLES FROM BELOW TO HERE AFTER IT IS WORKING ####
+
+############### CSV DATA IMPORT AND FILTERING ###############
+
+$CSVLog = Join-Path $LogPath "CSV_Generated_Logs.csv"
+
+$csv_data = Import-Csv -Path $CSVLog
+# Check to see if data is being pulled
+<#
+if ($csv_data.Count -gt 0) {
+    "CSV has $($csv_data.Count) rows"
+} else {
+    "CSV has no data or path is incorrect"
+}
+#>
+
+# CSV Calculations #
+# "TimeStamp","Service","EventType","Event","Email","LogID"
+# Get count of log events
+# Prints a small output of what the last batch run created -- Can be used for verifying everything worked and just a nice output to have
+# $CSV_Log_Objects | Group-Object -Property Service,EventType,Event | Select Name, Count
+
+$totalErrorCount   = 0
+$totalSuccessCount = 0
+$dayCount
+
+$errorCounts   = @{}   # Key = error Event,   Value = count -- Hashtable
+$successCounts = @{}   # Key = success Event, Value = count -- Hashtable
+
+# Loop through each row (record) in the imported CSV
+foreach ($row in $csv_data) {
+
+    # Read the columns from the current CSV row
+    $service = $row.Service
+    $event   = $row.Event
+    #$row.Date = ([datetime]$row.TimeStamp).Date  # keep only year-month-day from the timestamp
+
+    # If the service from the CSV does NOT exist in the $Services hashtable,
+    # skip this row and move on to the next one
+    if (-not $Services.ContainsKey($service)) {
+        continue
+    }
+
+    # Check if the current event is listed as an ERROR event for the given service
+    if ($Services[$service].errorEvents -contains $event) {
+
+        # Increment the total number of errors found regardless of the error
+        $totalErrorCount++
+
+        # If this specific error event has not been seen before, create its counter in the hashtable
+        if (-not $errorCounts.ContainsKey($event)) {
+            $errorCounts[$event] = 0
+        }
+
+        # Increment the count for this specific error event
+        $errorCounts[$event]++
+
+    }
+    # If the event is NOT an error do the following
+    else {
+
+        # Increment the total number of successful operations regardless
+        $totalSuccessCount++
+
+        # If this success event has not been seen before, initialize its counter in the hashtable
+        if (-not $successCounts.ContainsKey($event)) {
+            $successCounts[$event] = 0
+        }
+
+        # Increment the count for this specific success event
+        $successCounts[$event]++
+    }
+}
+
+################ OUTPUT ################
+
+Write-Host "Total Errors: $totalErrorCount" -ForegroundColor Red
+# Outputs the errors and count for specific errors
+$errorCounts.GetEnumerator() | Sort-Object Key | 
+Select-Object @{Name='Error';Expression={$_.Key}},@{Name='Count';Expression={$_.Value}} | Format-Table
+
+Write-Host "Total Successful Operations: $totalSuccessCount" -ForegroundColor Green
+
+$successCounts.GetEnumerator() | Sort-Object Key | 
+Select-Object @{Name='SuccessEvent';Expression={$_.Key}}, @{Name='Count';Expression={$_.Value}} | Format-Table -AutoSize
+
+################ ERRORS PER DAY ################
+
+################ ERRORS PER DAY ################
+
+$dailyErrors = $csv_data |
+    Where-Object {
+        $Services.ContainsKey($_.Service) -and
+        $Services[$_.Service].errorEvents -contains $_.Event
+    } |
+    Group-Object -Property { ([datetime]$_.TimeStamp).Date } |
+    Select-Object @{Name='Date';Expression={$_.Name}}, @{Name='Count';Expression={$_.Count}} |
+    Sort-Object Date
+
+Write-Host "`nErrors Per Day:" -ForegroundColor Yellow
+$dailyErrors | Format-Table -AutoSize
+
