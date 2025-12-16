@@ -56,21 +56,15 @@ First 3 can go in utils or analyzer its up to you
 
  Dot-source utils.ps1 and config.ps1 - Completed
 
- Add CLI argument parsing for:
+Target log file(s) or folder - Completed
 
-Batch vs tailing mode
+ Load and parse logs from data/logs/ - Completed for CSV only
 
-Target log file(s) or folder
+Compute metrics:
 
- Load and parse logs from data/logs/
+Log counts - Completed 
 
- Normalize log entries
-
- Compute metrics:
-
-Errors per minute per service
-
-Log counts
+Errors per day - Completed
 
 Alerting System -- Just have it output alerts to the console -- Can make an email function for it too but not really necessary for this
 Have the email function in place and just comment it out
