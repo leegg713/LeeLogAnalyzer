@@ -80,10 +80,8 @@ function Generate-RandomUserLog {
     $MaxLength = 8
     ### USERNAME GENERATION SECTION ###
     $totalLength = Get-Random -Minimum $MinLength -Maximum ($MaxLength + 1)
-    # Number of letters (at least 3 currently, but could be full length)
-    $letterCount = Get-Random -Minimum 3 -Maximum ($totalLength + 1)
-    # Numbers are optional depending on what random $totalLength and $letter count that was generated
-    $numberCount = $totalLength - $letterCount
+    $numberCount = 2
+    $letterCount = $totalLength - $numberCount 
     <#
     This creates a range of numbers from 97 to 122, which are ASCII codes for lowercase letters:
     Pipe (|) to Get-Random -Count $letterCount This takes that list of numbers and randomly selects $letterCount items to get the actual letters
