@@ -1,3 +1,4 @@
+// Dev container for PowerShell development with Python support and VS Code tooling
 {
   "name": "PowerShell Dev Container",
   "image": "mcr.microsoft.com/powershell:latest",
