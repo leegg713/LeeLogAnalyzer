@@ -12,6 +12,9 @@ This will be a repository that functions like a splunk type tool for practicing 
 - Essentially a centralized spot to make changes for different script runs 
 
 # Analzyer File
+- Reads log files (CSV/JSON/text) produced by the generator and summarizes events, counts, and basic alerts using thresholds from `config.ps1`.
+- Supports both batch and streaming analysis modes with simple filtering by service/event and output to console or file.
+- Relies on `config.ps1` for settings and imports `utils.ps1` for shared helper functions; intended for quick exploration and lightweight alerting.
 
 # Generator File
 - How to import a PowerShell file to another script to use it -- Imports utils.ps1 file      . "$PSScriptRoot\utils.ps1"
@@ -26,3 +29,41 @@ This will be a repository that functions like a splunk type tool for practicing 
 - The script handles timing for streaming mode with basic date and sleep functions, validates user input, automatically creates folders when needed, and organizes log data in formats like CSV, JSON, and plain text so everything is easy to read and reuse when analyzing the data with analyzer.ps1.
 
 # Utils File
+- Provides small reusable helper functions (path builders, timestamp formatting, simple log parsing, validation, and file I/O helpers).
+- Imported into other scripts with `. "$PSScriptRoot\utils.ps1"` to keep common logic centralized and reusable.
+- Keeps `analyzer.ps1` and `generator.ps1` concise by handling repetitive tasks.
+
+# Usage examples (generator + analyzer)
+- Run the generator (batch): `./generator.ps1 -Mode batch -Count 100` — creates logs in `data/logs/`.
+- Run the generator (streaming): `./generator.ps1 -Mode stream -Rate 5 -Duration 60` — streams events into log files.
+- Run the analyzer against a log folder: `./analyzer.ps1` — parses logs, computes counts, and prints alerts.
+
+# How to configure services/events/thresholds
+- Edit `config.ps1` to define the services, event types, probabilities, and alert thresholds used by the generator and analyzer.
+- Typical configuration elements:
+	- A list of services (e.g., web, auth, db).
+	- Event definitions with probabilities and error rates (used by the generator to simulate events).
+	- Thresholds for alerting (errors per minute, failed logins, etc.) that `analyzer.ps1` uses to trigger alerts.
+
+Example (conceptual snippet):
+```
+# config.ps1 (concept)
+$Services = @('web','auth')
+$Events = @{
+	'login'   = @{ probability = 0.7; errorRate = 0.01 }
+	'request' = @{ probability = 0.3; errorRate = 0.005 }
+}
+$Thresholds = @{ ErrorsPerMinute = 5; FailedLogins = 3 }
+```
+
+- After editing `config.ps1`, re-run the generator or analyzer to apply the new settings.
+
+# Future Enhancements and Updates
+
+- Add anomaly detection rules to send an alert (Email function and logic for error rate per user)
+
+- Change user log to generate username list to use for logs so we have one user having multiple events
+
+- GUI dashboard for analyzer
+
+- Enable/disable bad actor automatically (Function to lock AD account, scramble password, etc -- Just in theory)
