@@ -1,9 +1,45 @@
 # LeeLogAnalyzer
-This will be a repository that functions like a splunk type tool for practicing reading logs and alerting. 
+This will be a repository that functions like a splunk type tool for practicing reading logs and alerting.
+This project is for educational and simulation purposes only.
+Any response actions (account lockouts, password changes, etc.) are conceptual and should not be used in production environments.
 
-# This will contain information that will be useful for other projects
-# Will track import things I learn along with useful links and external documentation
-# Will help create a good read me at the end
+## What This Project Demonstrates
+- PowerShell design using multiple ps files
+- Config-driven scripting to be able to modify one file to make changes everywhere
+- Log analysis and alerting logic
+- Streaming vs batch processing
+- Script reusability and maintainability
+
+## Project Goals
+- Practice log generation, parsing, and alerting logic similar to SIEM tools (e.g., Splunk).
+- Provide a lightweight, script-based environment for experimenting with detection logic to learn security logging concepts.
+- Keep everything PowerShell-based and dependency-free.
+
+## Not Goals 
+- Not intended to replace a real SIEM.
+- No real-time correlation across distributed systems.
+- No production security enforcement (all “response” actions are simulated and not real).
+
+
+# Repo Structure
+
+LeeLogAnalyzer/
+│
+├── analyzer.ps1        # Parses logs, summarizes events, triggers alerts
+├── generator.ps1       # Generates simulated logs (batch or streaming)
+├── utils.ps1           # Shared helper functions used in analyzer.ps1 and generator.ps1
+├── config.ps1          # Centralized configuration for analyzer.ps1 and generator.ps1
+│
+├── data/
+│   └── logs/            # Generated log files in the following formats (CSV/JSON/TXT)
+│
+└── README.md
+
+## Requirements to Run
+- PowerShell 5.1+ or PowerShell 7+
+- Windows, macOS, or Linux
+- No external modules required currently
+
 
 # Config File
 
