@@ -1,18 +1,54 @@
 <#
 .SYNOPSIS
-    Generates logs that are used to simulate event logs
+    Generates simulated event log data in batch or streaming mode.
 
 .DESCRIPTION
-    Generates logs in batch or streaming mode and outputs them to specific folders specified in the config.ps1 file. 
+    Creates log events based on configured services, users, and event definitions
+    to simulate a real-world application and security logs. Logs can be generated in batch
+    mode for static analysis or streaming mode to mimic live logs being generated.
+    Output is written to CSV, JSON, and plain text formats using paths and defaults
+    defined in config.ps1 to have data save in multiple formats
+
+.PARAMETER Mode
+    Specifies how logs are generated.
+    Valid values:
+      - Batch: Generates a fixed number of events in a single run.
+      - Streaming: Continuously generates events for a specified duration.
+
+.PARAMETER Append
+    Appends generated log data to existing log files instead of overwriting them.
+
+.PARAMETER Duration
+    Duration in seconds for streaming mode. Overrides the default duration in config.ps1.
+
+.PARAMETER EventsPerSecond
+    Number of events generated per second in streaming mode.
+    Overrides the default value in config.ps1.
+
+.PARAMETER ClearOldLogs
+    Deletes existing log files in the log directory before generating new logs.
+
+.INPUTS
+    None. All data is generated internally.
+
+.OUTPUTS
+    Log files written to the directory specified by $LogPath:
+      - CSV_Generated_Logs.csv
+      - JSON_Generated_Logs.json
+      - Text_Generated_Logs.txt
 
 .EXAMPLE
-    ./generator.ps1  -Mode $Streaming
-    ./generator.ps1  -Mode $Batch 
+    ./generator.ps1 -Mode Batch
 
+.EXAMPLE
+    ./generator.ps1 -Mode Batch -Append
+
+.EXAMPLE
+    ./generator.ps1 -Mode Streaming -Duration 60 -EventsPerSecond 10
 
 .NOTES
-
-
+    Requires config.ps1 and utils.ps1 in the script root.
+    Designed for log analysis practice, alerting simulations, and Splunk-style workflows.
 #>
 
 [CmdletBinding()]
