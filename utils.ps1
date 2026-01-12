@@ -1,18 +1,6 @@
 # Load the config so $Services and other settings are available
 . "$PSScriptRoot\config.ps1"
-#Write-Host " $LogPath "
-<#
-#### FUNCTIONS TO WORK ON ####
- Random log level generator (INFO/WARN/ERROR)
-
- Bad actor behavior generator (optional, triggers anomalies)
-
- Parsing helper functions (for analyzer)
-
- Normalization and correlation helpers (for analyzer)
-
- Metrics calculation helpers (error counts, events per minute, etc.)
-#>
+#Write-Host " $LogPath " Test to make sure it loaded
 
 ## PARAMETER BLOCK EXAMPLE ##
 <#
@@ -64,9 +52,9 @@
 ### EXAMPLE USAGE ###
 <#
 $timeStamp = Generate-RandomTimeStamp
-$timeStamp.PlainText   # 2025-11-19 21:09:23
-$timeStamps.CSV        # 2025-11-19T21:09:23
-$timeStamp.JSON        # 2025-11-19T21:09:23.289Z
+$timeStamp.PlainText   # Text File
+$timeStamp.CSV         # (CSV)
+$timeStamp.JSON        # JSON
 #>
 #Generate-RandomTimeStamp
 
@@ -121,20 +109,25 @@ $userLog.LogID   # 3e288663-54d7-433c-9dfb-de98583daea0
 
 function Generate-RandomLogEvent {
     <#
-    $goodSystemEvents = $Services["system"]["events"]
-    Write-Host "Good System Events: $goodSystemEvents" # Prints list of all good system events
-    $goodAccessEvents = $Services["access"]["events"]
-    Write-Host "Good Access Events: $goodAccessEvents" # Prints list of all  good access Events
-    $goodAppEvents = $Services["app"]["events"]
-    Write-Host "Good App Events: $goodAppEvents" # Prints list of all good app events
+    # Display configured GOOD events by service
+    $goodSystemEvents = $Services["system"].events
+    $goodAccessEvents = $Services["access"].events
+    $goodAppEvents    = $Services["app"].events
 
-    $badSystemEvents = $Services["system"]["errorEvents"]
-    $badAccessEvents = $Services["access"]["errorEvents"]
-    $badAppEvents = $Services["app"]["errorEvents"]
-    Write-Host "Bad System Events: $badSystemEvents" # Prints list of all bad system events
-    Write-Host "Bad Access Events: $badAccessEvents" # Prints list of all bad access events
-    Write-Host "Bad App Events: $badAppEvents" # Prints list of all bad app events
+    Write-Host "Good System Events:  $goodSystemEvents"
+    Write-Host "Good Access Events:  $goodAccessEvents"
+    Write-Host "Good App Events:     $goodAppEvents"
+
+    # Display configured ERROR events by service
+    $badSystemEvents  = $Services["system"].errorEvents
+    $badAccessEvents  = $Services["access"].errorEvents
+    $badAppEvents     = $Services["app"].errorEvents
+
+    Write-Host "Bad System Events:   $badSystemEvents"
+    Write-Host "Bad Access Events:   $badAccessEvents"
+    Write-Host "Bad App Events:      $badAppEvents"
     #>
+    
     # Pick a random service name
     $service = Get-Random -InputObject @($Services.Keys)
 
