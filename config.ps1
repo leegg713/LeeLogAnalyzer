@@ -32,24 +32,27 @@
 # -----------------------------
 # Services and Event Definitions
 # -----------------------------
-## HASHTABLE ##
 $Services = @{
-    "system" = @{
-        "events"     = @("startup","shutdown","update")
-        "errorEvents" = @("error")
-        "errorRate"  = 0.05
+    system = [PSCustomObject]@{
+        Name        = "System"
+        Events      = @("startup","shutdown","update")
+        ErrorEvents = @("error")
+        ErrorRate   = 0.05
     }
-    "access" = @{
-        "events"      = @("login","logout","passwordChange")
-        "errorEvents" = @("invalidPassword","invalidUsername")
-        "errorRate"   = 0.1
+    access = [PSCustomObject]@{
+        Name        = "Access"
+        Events      = @("login","logout","passwordChange")
+        ErrorEvents = @("invalidPassword","invalidUsername")
+        ErrorRate   = 0.1
     }
-    "app" = @{
-        "events"      = @("start","stop","restart")
-        "errorEvents" = @("exception","crash")
-        "errorRate"   = 0.08
+    app = [PSCustomObject]@{
+        Name        = "Application"
+        Events      = @("start","stop","restart")
+        ErrorEvents = @("exception","crash")
+        ErrorRate   = 0.08
     }
 }
+
 
 #EXAMPLE USAGE#
 <#
@@ -59,8 +62,9 @@ $Services["app"]["errorRate"]
 Output: 0.08
 #>
 #----------#  Paths #----------#
-$LogPath = "$PSScriptRoot/data/logs/"          # Where generated logs are stored
-$AnalysisPath = "$PSScriptRoot/data/analysis/" # Where analysis reports go
+$LogPath      = Join-Path $PSScriptRoot "data/logs" # Where generated logs are stored
+$AnalysisPath = Join-Path $PSScriptRoot "data/analysis" # Where analysis reports go
+
 
 
 #----------# Generator Defaults #----------#
