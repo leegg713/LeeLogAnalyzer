@@ -169,3 +169,29 @@ while ($i -lt 100) {
 }
 #>
 
+# Copied over this information from generator to have this be a function that is reusable
+function Write-LogOutput {
+    param (
+        $CSV,
+        $JSON,
+        $TXT,
+        [switch]$Append
+    )
+
+    # Make sure these global variables exist in the calling script
+    if (-not ($CSVLog -and $JSONLog -and $PlainTextLog)) {
+        throw "Global log paths not defined: $CSVLog, $JSONLog, $PlainTextLog"
+    }
+
+    if ($Append) {
+        $CSV  | Export-Csv $CSVLog -Append -NoTypeInformation
+        $JSON | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Append -Encoding UTF8
+        $TXT  | Out-File -FilePath $PlainTextLog -Append -Encoding UTF8
+    }
+    else {
+        $CSV  | Export-Csv $CSVLog -NoTypeInformation
+        $JSON | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8
+        $TXT  | Out-File -FilePath $PlainTextLog -Encoding UTF8
+    }
+}
+
