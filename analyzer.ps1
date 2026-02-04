@@ -45,15 +45,18 @@
 
 $CSVLog = Join-Path $LogPath "CSV_Generated_Logs.csv"
 
-$csv_data = Import-Csv -Path $CSVLog
-# Check to see if data is being pulled
-<#
-if ($csv_data.Count -gt 0) {
-    "CSV has $($csv_data.Count) rows"
-} else {
-    "CSV has no data or path is incorrect"
+if (-not (Test-Path $CSVLog)) {
+    Write-Host "CSV log file not found at $CSVLog" -ForegroundColor Red
+    return
 }
-#>
+
+$csv_data = Import-Csv -Path $CSVLog
+
+if ($csv_data.Count -eq 0) {
+    Write-Host "CSV log file is empty!" -ForegroundColor Yellow
+    return
+}
+
 
 # CSV Calculations #
 # "TimeStamp","Service","EventType","Event","Email","LogID"
