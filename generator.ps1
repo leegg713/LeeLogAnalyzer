@@ -66,21 +66,15 @@ param
     [Parameter(Mandatory = $False)]
     [switch]$ClearOldLogs
 )
-# Imports configuration file config.ps1
+# Imports configuration file config.ps1 and utils.ps1 file
 . "$PSScriptRoot\config.ps1"
-#Write-Host "Test to see if this is working"
+. "$PSScriptRoot\utils.ps1"
 # Gets the log path from config file -- So it basically makes the variable a global one in a way
-#$LogPath = "$PSScriptRoot/data/logs/"          # Where generated logs are stored
-#Write-Host "$LogPath"
+$LogPath = "$PSScriptRoot/data/logs/"          # Where generated logs are stored
+Write-Debug "Log path is: $LogPath"
 
 # Imports utils.ps1 file
 . "$PSScriptRoot\utils.ps1"
-
-# Clears Old Logs 
-if ($ClearOldLogs) {
-    Write-Host "Clearing entire log directory..." -ForegroundColor Yellow
-    Get-ChildItem -Path $LogPath -File | Remove-Item -Force
-}
 
 
 # If the folder does not exist for the data, creates the folder
@@ -88,6 +82,11 @@ if (-not (Test-Path $LogPath)) {
     New-Item -ItemType Directory -Path $LogPath | Out-Null
 }
 
+# Clears Old Logs 
+if ($ClearOldLogs) {
+    Write-Host "Clearing entire log directory..." -ForegroundColor Yellow
+    Get-ChildItem -Path $LogPath -File | Remove-Item -Force
+}
 
 ############ Global Log Path Variables for outputting data to files ############ 
 $CSVLog = Join-Path $LogPath "CSV_Generated_Logs.csv"
@@ -132,31 +131,7 @@ for ($i = 0; $i -lt $DefaultBatchSize; $i++) {
 
     }
     # BELOW/OUTSIDE FOR LOOP #
-
-# TXT
-# Loop through each log object in the array $Log_Objects
-# and create a formatted string for each log entry.
-
-# Loop through each CSV log object and build a formatted string
-foreach ($log in $CSV_Log_Objects) {
-    $line = "$($log.TimeStamp) | $($log.Email) | $($log.Event) | $($log.Service) | $($log.EventType) | $($log.LogID)"
-    $logLines += $line
-}
-# 
-if ($Append){
-    # Appends to CSV and doesn't overwrite if $Append parameter selected
-    $CSV_Log_Objects | Export-Csv -Path $CSVLog -Append -NoTypeInformation
-    $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8 -Append
-    $logLines | Out-File -FilePath $PlainTextLog -Encoding UTF8 -Append
-
-
-}
-else{
-    $CSV_Log_Objects | Export-Csv -Path $CSVLog -NoTypeInformation
-    $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8
-    $logLines | Out-File -FilePath $PlainTextLog -Encoding UTF8
-
-}
+    Write-LogOutput -CSV $CSV_Log_Objects -JSON $JSON_Log_Objects -TXT $logLines -Append:$Append
 
 # Summary of last batch run
 
@@ -179,12 +154,11 @@ if ($Mode -eq "Streaming") {
     }
 
     $endTime = (Get-Date).AddSeconds($DefaultDuration)
-    # Can comment out the write hosts after verifying everything works
-    Write-Host "Ending at: $endTime"
-    Write-Host "Duration: $DefaultDuration seconds"
-    Write-Host "Events per second: $DefaultEventsPerSecond"
+    Write-Host "Ending at: $endTime" -ForegroundColor Yellow # will be in UTC when running in Github codespaces
+    Write-Host "Duration: $DefaultDuration seconds" -ForegroundColor Yellow
+    Write-Host "Events per second: $DefaultEventsPerSecond" -ForegroundColor Yellow
 
-    Write-Host "Streaming mode enabled... Ctrl+C to stop it early"
+    Write-Host "Streaming mode enabled... Ctrl+C to stop it early" -ForegroundColor Green
 
     while ((Get-Date) -lt $endTime) {
 
@@ -218,19 +192,8 @@ if ($Mode -eq "Streaming") {
                 Event     = $logEvent
             }
         }
-
-        # Build TXT log lines
-        foreach ($log in $CSV_Log_Objects) {
-            $line = "$($log.TimeStamp) | $($log.Email) | $($log.Event) | $($log.Service) | $($log.EventType) | $($log.LogID)"
-            $logLines += $line
-        }
-
-        # (Streaming = append the whole time -- Tip: Use Clear Old Logs to start fresh)
-        $CSV_Log_Objects  | Export-Csv -Path $CSVLog -Append -NoTypeInformation
-        $JSON_Log_Objects | ConvertTo-Json -Depth 5 | Out-File -FilePath $JSONLog -Encoding UTF8 -Append
-        $logLines         | Out-File -FilePath $PlainTextLog -Encoding UTF8 -Append
-
-        # Maintain exactly 1 loop per second
+        Write-LogOutput -CSV $CSV_Log_Objects -JSON $JSON_Log_Objects -TXT $logLines -Append:$Append
+        # 1 loop per second
         Start-Sleep -Seconds 1
     }
 }
