@@ -1,49 +1,28 @@
 # Load the config so $Services and other settings are available
 . "$PSScriptRoot\config.ps1"
 #Write-Host " $LogPath " Test to make sure it loaded
-
-## PARAMETER BLOCK EXAMPLE ##
-<#
-    [CmdletBinding()]
-    param(
-    [Parameter(Mandatory = $false)]
-    [ValidateSet("Text","CSV","JSON")]
-    [string]$OutputType = "Text"    # Default output format
-    )
-    #>
-
-
 ######## Function to create a random time stamp ########
     function Generate-RandomTimeStamp {
-    $daysAgo = 30
+        [CmdletBinding()]
+    param(
+        [int]$daysAgo = 30
+    )
     $startTime = (Get-Date).AddDays(-$daysAgo)   # 30 days ago
     $endTime = Get-Date
     #$random = Get-Random -Minimum 1 -Maximum 11 #Gets you between 1 and 10 
     #Write-Host "$random"
     <#
-    $startTime.Ticks -- numeric start of the range.
-    $endTime.Ticks --  numeric end of the range.
+    $startTime.Ticks -- numeric start of the range when using Get-Date in Ticks.
+    $endTime.Ticks --  numeric end of the range when using Get-Date.
+    # https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks?view=net-10.0
+    # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-date?view=powershell-7.5
     Get-Random -- picks a random tick count between those two numbers.
     Get-Date(random ticks) -- converts that number back into a proper date/time.
     $randomTime --  now holds a random DateTime object somewhere in the last $daysAgo days
     #>
     $randomTime = Get-Date ((Get-Random -Minimum $startTime.Ticks -Maximum $endTime.Ticks))
-    <#
-    # Plain text
-    $plainTextTime = $randomTime.ToString("yyyy-MM-dd HH:mm:ss")
-    #Write-Host "$plainTextTime"
-
-    # CSV or ISO-like
-    $csvTime = $randomTime.ToString("yyyy-MM-ddTHH:mm:ss")
-    #Write-Host "$csvTime"
-
-    # JSON with milliseconds
-    $jsonTime = $randomTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-    #Write-Host "$jsonTime"
-    #>
-
-    #### Return as a hashtable ####
-    return @{
+    #### Return as a hashtable to use in other functions ####
+    return [PSCustomObject]@{
         PlainText = $randomTime.ToString("yyyy-MM-dd HH:mm:ss")
         CSV       = $randomTime.ToString("yyyy-MM-ddTHH:mm:ss")
         JSON      = $randomTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
@@ -62,14 +41,26 @@ $timeStamp.JSON        # JSON
 #Random user/logID generator
 ######## Function to create a random user with a log event ID ########
 function Generate-RandomUserLog {
-    # Function Variables that can modify output/return
-    $domain = "@leeTestDomain.com"
-    $MinLength = 6
-    $MaxLength = 8
+    [CmdletBinding()]
+    param (
+        [string]$Domain = "@leeTestDomain.com",
+
+        [ValidateRange(3, 20)]
+        [int]$MinLength = 6,
+
+        [ValidateRange(3, 20)]
+        [int]$MaxLength = 8,
+
+        [ValidateRange(0, 10)]
+        [int]$NumberCount = 2
+    )
     ### USERNAME GENERATION SECTION ###
     $totalLength = Get-Random -Minimum $MinLength -Maximum ($MaxLength + 1)
-    $numberCount = 2
-    $letterCount = $totalLength - $numberCount 
+    $letterCount = $totalLength - $numberCount
+
+    if ($MinLength -gt $MaxLength) {
+        throw "MinLength cannot be greater than MaxLength."
+    }
     <#
     This creates a range of numbers from 97 to 122, which are ASCII codes for lowercase letters:
     Pipe (|) to Get-Random -Count $letterCount This takes that list of numbers and randomly selects $letterCount items to get the actual letters
@@ -90,7 +81,7 @@ function Generate-RandomUserLog {
     #Write-Host "$guid"
     # Return as a hashtable
     #<#
-    return @{
+    return [PSCustomObject]@{
         Email = $email
         LogID = $guid
     }
@@ -127,6 +118,10 @@ function Generate-RandomLogEvent {
     Write-Host "Bad Access Events:   $badAccessEvents"
     Write-Host "Bad App Events:      $badAppEvents"
     #>
+    # Chceck to make sure services loads correctly
+    if (-not $Services -or -not $Services.Keys.Count) {
+    throw "Services configuration not loaded or empty."
+}
     
     # Pick a random service name
     $service = Get-Random -InputObject @($Services.Keys)
